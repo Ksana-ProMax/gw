@@ -1,0 +1,298 @@
+/* =========================================================
+   Gathering Waves Projects - Global Styles
+   ========================================================= */
+
+:root {
+    --gw-gradient-1: #4f46e5;   /* indigo */
+    --gw-gradient-2: #ec4899;   /* pink */
+    --gw-gradient-3: #06b6d4;   /* cyan */
+    --gw-gradient-4: #f59e0b;   /* amber */
+    --gw-card-bg: rgba(255, 255, 255, 0.78);
+    --gw-card-border: rgba(255, 255, 255, 0.45);
+    --gw-text: #1f2937;
+    --gw-text-muted: #4b5563;
+    --gw-nav-bg: rgba(255, 255, 255, 0.18);
+    --gw-nav-bg-hover: rgba(255, 255, 255, 0.32);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    font-family: "Helvetica Neue", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    color: var(--gw-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    min-height: 100vh;
+    /* 多层径向渐变叠加，背景尺寸放大到 4 倍，靠 background-position 动画做缓慢流动 */
+    background:
+        radial-gradient(at 20% 20%, var(--gw-gradient-1) 0px, transparent 50%),
+        radial-gradient(at 80% 0%, var(--gw-gradient-2) 0px, transparent 50%),
+        radial-gradient(at 0% 70%, var(--gw-gradient-3) 0px, transparent 50%),
+        radial-gradient(at 80% 80%, var(--gw-gradient-4) 0px, transparent 50%),
+        linear-gradient(135deg, #312e81 0%, #1e1b4b 100%);
+    background-size: 400% 400%, 400% 400%, 400% 400%, 400% 400%, 100% 100%;
+    background-attachment: fixed;
+    animation: gwGradientShift 28s ease-in-out infinite;
+}
+
+/* 整体色调会随时间在冷色 / 暖色 / 冷色之间缓慢漂移 */
+@keyframes gwGradientShift {
+    0% {
+        background-position:
+            0% 0%,
+            100% 0%,
+            0% 100%,
+            100% 100%,
+            0% 0%;
+        filter: hue-rotate(0deg);
+    }
+    25% {
+        background-position:
+            100% 50%,
+            0% 50%,
+            50% 0%,
+            50% 100%,
+            0% 0%;
+        filter: hue-rotate(40deg);
+    }
+    50% {
+        background-position:
+            100% 100%,
+            0% 0%,
+            100% 50%,
+            0% 50%,
+            0% 0%;
+        filter: hue-rotate(120deg);
+    }
+    75% {
+        background-position:
+            0% 100%,
+            100% 100%,
+            50% 50%,
+            50% 0%,
+            0% 0%;
+        filter: hue-rotate(200deg);
+    }
+    100% {
+        background-position:
+            0% 0%,
+            100% 0%,
+            0% 100%,
+            100% 100%,
+            0% 0%;
+        filter: hue-rotate(360deg);
+    }
+}
+
+/* =========================================================
+   Layout
+   ========================================================= */
+
+.gw-page {
+    /* 保留左右各 15% 空白 */
+    padding: 96px 15% 64px;
+    min-height: 100vh;
+}
+
+@media (max-width: 992px) {
+    .gw-page {
+        padding: 96px 8% 48px;
+    }
+}
+
+@media (max-width: 576px) {
+    .gw-page {
+        padding: 88px 5% 32px;
+    }
+}
+
+/* =========================================================
+   Floating top-right navbar
+   ========================================================= */
+
+.gw-nav {
+    position: fixed;
+    top: 18px;
+    right: 24px;
+    z-index: 1080;
+    display: flex;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    background: var(--gw-nav-bg);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    box-shadow:
+        0 6px 24px rgba(15, 23, 42, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.gw-nav:hover {
+    background: var(--gw-nav-bg-hover);
+    box-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    transform: translateY(-1px);
+}
+
+.gw-nav__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+.gw-nav__link:hover,
+.gw-nav__link:focus {
+    color: #1e1b4b;
+    background-color: rgba(255, 255, 255, 0.92);
+    text-decoration: none;
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.gw-nav__link.is-active {
+    color: #1e1b4b;
+    background-color: rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 576px) {
+    .gw-nav {
+        top: 12px;
+        right: 12px;
+        padding: 6px 8px;
+    }
+    .gw-nav__link {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+}
+
+/* =========================================================
+   Main content card
+   ========================================================= */
+
+.gw-card {
+    background: var(--gw-card-bg);
+    border: 1px solid var(--gw-card-border);
+    border-radius: 24px;
+    padding: 56px clamp(28px, 5vw, 64px);
+    box-shadow:
+        0 30px 60px -20px rgba(15, 23, 42, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.gw-card__eyebrow {
+    display: inline-block;
+    padding: 4px 12px;
+    margin-bottom: 18px;
+    border-radius: 999px;
+    background: rgba(79, 70, 229, 0.12);
+    color: #4338ca;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.gw-card__title {
+    margin: 0 0 24px 0;
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    font-weight: 700;
+    line-height: 1.15;
+    background: linear-gradient(120deg, #4338ca 0%, #db2777 60%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.gw-card__lead {
+    margin: 0;
+    color: var(--gw-text-muted);
+    font-size: clamp(1rem, 1.4vw, 1.125rem);
+    line-height: 1.85;
+    letter-spacing: 0.01em;
+}
+
+.gw-card__lead + .gw-card__lead {
+    margin-top: 1.2em;
+}
+
+/* 通用空页面卡片 */
+.gw-empty {
+    text-align: center;
+    padding: 96px clamp(28px, 5vw, 64px);
+}
+
+.gw-empty__title {
+    margin: 0 0 12px 0;
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 700;
+    color: #1e1b4b;
+}
+
+.gw-empty__hint {
+    margin: 0;
+    color: var(--gw-text-muted);
+    font-size: 1rem;
+}
+
+.gw-empty__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 28px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    background: linear-gradient(120deg, #4338ca, #db2777);
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 10px 24px -8px rgba(67, 56, 202, 0.55);
+}
+
+.gw-empty__back:hover {
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px -8px rgba(67, 56, 202, 0.7);
+}
+
+/* =========================================================
+   Footer
+   ========================================================= */
+
+.gw-footer {
+    margin-top: 32px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+}
+
+/* 用户系统设置为「减少动态效果」时关闭渐变动画，避免引起不适 */
+@media (prefers-reduced-motion: reduce) {
+    body {
+        animation: none;
+    }
+}
