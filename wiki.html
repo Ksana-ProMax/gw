@@ -107,6 +107,8 @@
 
             // 当前激活的栏目 id
             var activeId = null;
+            // 缓存：catId -> 词条数组（避免重复请求）
+            var cache = {};
 
             // ---- 工具 ----
             function escapeHtml(str) {
@@ -172,10 +174,9 @@
                         '<div class="gw-state gw-state--empty">' +
                         '<i class="bi bi-inbox"></i>' +
                         '<p class="gw-state__msg">该栏目下还没有词条</p>' +
-                        '<p class="gw-state__hint">在 data/wiki/' +
-                        '<code id="emptyCatId"></code>/ 目录里新建一个 JSON 文件并加入 index.json 即可。</p>' +
+                        '<p class="gw-state__hint">编辑 data/wiki/' +
+                        '<code id="emptyCatId"></code>.json，往数组里添加词条即可。</p>' +
                         "</div>";
-                    // 注入栏目 id，避免硬转义
                     var node = document.getElementById("emptyCatId");
                     if (node) node.textContent = activeId || "";
                     return;
@@ -205,7 +206,17 @@
                     .join("");
             }
 
-            // ---- 加载一个栏目的词条 ----
+            // ---- 取一个栏目的词条（带缓存） ----
+            function fetchEntries(catId) {
+                if (cache[catId]) return Promise.resolve(cache[catId]);
+                return getJSON(DATA_BASE + catId + ".json").then(function (data) {
+                    var arr = Array.isArray(data) ? data : [];
+                    cache[catId] = arr;
+                    return arr;
+                });
+            }
+
+            // ---- 切换栏目（带 180ms 淡入） ----
             function loadCategory(catId) {
                 $entriesEl.setAttribute("aria-busy", "true");
                 $entriesEl.classList.add("is-swapping");
@@ -215,24 +226,10 @@
                     '<div class="gw-entry__skeleton" aria-hidden="true"></div>' +
                     '<div class="gw-entry__skeleton" aria-hidden="true"></div>';
 
-                var indexUrl = DATA_BASE + catId + "/index.json";
-                getJSON(indexUrl)
-                    .then(function (files) {
-                        if (!Array.isArray(files)) {
-                            throw new Error("index.json 必须是文件名字符串数组");
-                        }
-                        return Promise.all(
-                            files.map(function (f) {
-                                return getJSON(DATA_BASE + catId + "/" + f).then(function (data) {
-                                    return { file: f, data: data };
-                                });
-                            })
-                        );
-                    })
-                    .then(function (results) {
-                        // 显示前先做一次 180ms 的淡出，给视觉一个过渡
+                fetchEntries(catId)
+                    .then(function (entries) {
                         window.setTimeout(function () {
-                            renderEntries(results.map(function (r) { return r.data; }));
+                            renderEntries(entries);
                             $entriesEl.classList.remove("is-swapping");
                         }, 180);
                     })
@@ -241,12 +238,12 @@
                         renderError(
                             $entriesEl,
                             "无法加载栏目「" + catId + "」的词条",
-                            "请确认 data/wiki/" + catId + "/ 目录存在，并通过本地 HTTP 服务访问页面。"
+                            "请确认 data/wiki/" + catId + ".json 存在，并通过本地 HTTP 服务访问页面。"
                         );
                     });
             }
 
-            // ---- 启动：拉取栏目清单 ----
+            // ---- 启动：拉栏目清单 + 并行拉所有词条用于侧边栏计数 ----
             getJSON(DATA_BASE + "categories.json")
                 .then(function (root) {
                     var categories = (root && root.categories) || [];
@@ -258,11 +255,11 @@
                         );
                         return null;
                     }
-                    // 并行拉取每个栏目的 index.json，用来在侧边栏显示词条数
+                    // 并行拉所有栏目的词条，缓存起来的同时也算条数
                     return Promise.all(
                         categories.map(function (cat) {
-                            return getJSON(DATA_BASE + cat.id + "/index.json")
-                                .then(function (files) { return [cat.id, Array.isArray(files) ? files.length : 0]; })
+                            return fetchEntries(cat.id)
+                                .then(function (entries) { return [cat.id, entries.length]; })
                                 .catch(function () { return [cat.id, 0]; });
                         })
                     ).then(function (pairs) {
@@ -283,7 +280,6 @@
                         "无法加载百科栏目清单",
                         "常见原因：直接以 file:// 打开页面（浏览器禁止本地 fetch）。请运行本地 HTTP 服务，例如：\n  npx serve .\n  python -m http.server 8000"
                     );
-                    // 内容区也提示一下
                     renderError(
                         $entriesEl,
                         "等待栏目清单…",
@@ -297,18 +293,16 @@
                 if (!item || item.classList.contains("is-active")) return;
                 activeId = item.dataset.category;
 
-                // 更新激活态
                 $listEl.querySelectorAll(".gw-categories__item").forEach(function (el) {
                     var on = el === item;
                     el.classList.toggle("is-active", on);
                     el.setAttribute("aria-selected", on ? "true" : "false");
                 });
 
-                // 标题栏同步：需要从已渲染的 DOM 中读出 title 和 count
+                // 标题栏从已渲染的 DOM 中读
                 var name = item.querySelector(".gw-categories__name").textContent;
-                var icon = item.querySelector(".gw-categories__icon i").className
-                    .split(" ")
-                    .filter(function (c) { return c.indexOf("bi-") === 0; })[0] || "bi-book";
+                var iconClass = item.querySelector(".gw-categories__icon i").className;
+                var icon = iconClass.split(" ").filter(function (c) { return c.indexOf("bi-") === 0; })[0] || "bi-book";
                 var count = item.querySelector(".gw-categories__count").textContent;
                 $titleEl.textContent = name;
                 $iconEl.innerHTML = '<i class="bi ' + escapeHtml(icon) + '"></i>';
