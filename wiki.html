@@ -109,6 +109,13 @@
             var activeId = null;
             // 缓存：catId -> 词条数组（避免重复请求）
             var cache = {};
+            // 最近一次从网络加载到的 categories 列表，写回 sessionStorage 时用
+            var lastCategories = null;
+
+            // sessionStorage 缓存配置。数据很小（4 个 JSON 不到 4KB），
+            // 5 分钟内认为缓存是新鲜的：够用，又不会让本地编辑后一直看不到更新。
+            var STORAGE_KEY = "gw:wiki:cache:v1";
+            var STORAGE_TTL = 5 * 60 * 1000;
 
             // ---- 工具 ----
             function escapeHtml(str) {
@@ -217,21 +224,31 @@
             }
 
             // ---- 切换栏目（带 180ms 淡入） ----
-            function loadCategory(catId) {
-                $entriesEl.setAttribute("aria-busy", "true");
-                $entriesEl.classList.add("is-swapping");
-                // 骨架屏
-                $entriesEl.innerHTML =
-                    '<div class="gw-entry__skeleton" aria-hidden="true"></div>' +
-                    '<div class="gw-entry__skeleton" aria-hidden="true"></div>' +
-                    '<div class="gw-entry__skeleton" aria-hidden="true"></div>';
+            // opts.skipAnimation = true 时直接渲染,跳过骨架屏和淡入延迟,
+            // 用于从 sessionStorage 命中时秒开首屏。
+            function loadCategory(catId, opts) {
+                opts = opts || {};
+                if (!opts.skipAnimation) {
+                    $entriesEl.setAttribute("aria-busy", "true");
+                    $entriesEl.classList.add("is-swapping");
+                    // 骨架屏
+                    $entriesEl.innerHTML =
+                        '<div class="gw-entry__skeleton" aria-hidden="true"></div>' +
+                        '<div class="gw-entry__skeleton" aria-hidden="true"></div>' +
+                        '<div class="gw-entry__skeleton" aria-hidden="true"></div>';
+                }
 
                 fetchEntries(catId)
                     .then(function (entries) {
-                        window.setTimeout(function () {
+                        if (opts.skipAnimation) {
                             renderEntries(entries);
                             $entriesEl.classList.remove("is-swapping");
-                        }, 180);
+                        } else {
+                            window.setTimeout(function () {
+                                renderEntries(entries);
+                                $entriesEl.classList.remove("is-swapping");
+                            }, 180);
+                        }
                     })
                     .catch(function (err) {
                         console.error("[wiki] 加载栏目失败:", err);
@@ -243,49 +260,146 @@
                     });
             }
 
-            // ---- 启动：拉栏目清单 + 并行拉所有词条用于侧边栏计数 ----
-            getJSON(DATA_BASE + "categories.json")
-                .then(function (root) {
-                    var categories = (root && root.categories) || [];
-                    if (!categories.length) {
+            // ---- sessionStorage 读写 ----
+            function loadFromStorage() {
+                try {
+                    var raw = sessionStorage.getItem(STORAGE_KEY);
+                    if (!raw) return null;
+                    var obj = JSON.parse(raw);
+                    if (!obj || !Array.isArray(obj.categories) || !obj.entries) return null;
+                    if (typeof obj.entries !== "object") return null;
+                    if (Date.now() - (obj.savedAt || 0) > STORAGE_TTL) return null;
+                    return obj;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function saveToStorage() {
+                try {
+                    sessionStorage.setItem(
+                        STORAGE_KEY,
+                        JSON.stringify({
+                            savedAt: Date.now(),
+                            categories: lastCategories || [],
+                            entries: cache
+                        })
+                    );
+                } catch (e) {
+                    // sessionStorage 不可用（隐私模式）或写满，静默失败
+                }
+            }
+
+            // ---- 启动渲染（categories + counts 准备好后调用） ----
+            // skipAnimation=true 时直接渲染首屏,用于从 sessionStorage 命中时秒开
+            function bootstrap(categories, counts, skipAnimation) {
+                lastCategories = categories;
+                activeId = categories[0].id;
+                renderSidebar(categories, counts);
+                renderTitlebar(categories[0], counts[activeId] || 0);
+                loadCategory(activeId, { skipAnimation: !!skipAnimation });
+            }
+
+            // ---- 首次加载 / 缓存失效：从网络拉 ----
+            function fullLoad() {
+                return getJSON(DATA_BASE + "categories.json")
+                    .then(function (root) {
+                        var categories = (root && root.categories) || [];
+                        if (!categories.length) {
+                            renderError(
+                                $listEl,
+                                "data/wiki/categories.json 中没有栏目",
+                                "请在该文件中定义 categories 数组。"
+                            );
+                            return null;
+                        }
+                        // 并行拉所有栏目的词条，缓存起来的同时也算条数
+                        return Promise.all(
+                            categories.map(function (cat) {
+                                return fetchEntries(cat.id)
+                                    .then(function (entries) { return [cat.id, entries.length]; })
+                                    .catch(function () { return [cat.id, 0]; });
+                            })
+                        ).then(function (pairs) {
+                            var counts = {};
+                            pairs.forEach(function (p) { counts[p[0]] = p[1]; });
+                            bootstrap(categories, counts);
+                            saveToStorage();
+                            return categories;
+                        });
+                    })
+                    .catch(function (err) {
+                        console.error("[wiki] 加载 categories.json 失败:", err);
                         renderError(
                             $listEl,
-                            "data/wiki/categories.json 中没有栏目",
-                            "请在该文件中定义 categories 数组。"
+                            "无法加载百科栏目清单",
+                            "常见原因：直接以 file:// 打开页面（浏览器禁止本地 fetch）。请运行本地 HTTP 服务，例如：\n  npx serve .\n  python -m http.server 8000"
                         );
-                        return null;
-                    }
-                    // 并行拉所有栏目的词条，缓存起来的同时也算条数
-                    return Promise.all(
-                        categories.map(function (cat) {
-                            return fetchEntries(cat.id)
-                                .then(function (entries) { return [cat.id, entries.length]; })
-                                .catch(function () { return [cat.id, 0]; });
-                        })
-                    ).then(function (pairs) {
-                        var counts = {};
-                        pairs.forEach(function (p) { counts[p[0]] = p[1]; });
-
-                        activeId = categories[0].id;
-                        renderSidebar(categories, counts);
-                        renderTitlebar(categories[0], counts[activeId] || 0);
-                        loadCategory(activeId);
-                        return categories;
+                        renderError(
+                            $entriesEl,
+                            "等待栏目清单…",
+                            "栏目加载成功后此处会自动出现词条。"
+                        );
                     });
-                })
-                .catch(function (err) {
-                    console.error("[wiki] 加载 categories.json 失败:", err);
-                    renderError(
-                        $listEl,
-                        "无法加载百科栏目清单",
-                        "常见原因：直接以 file:// 打开页面（浏览器禁止本地 fetch）。请运行本地 HTTP 服务，例如：\n  npx serve .\n  python -m http.server 8000"
-                    );
-                    renderError(
-                        $entriesEl,
-                        "等待栏目清单…",
-                        "栏目加载成功后此处会自动出现词条。"
-                    );
+            }
+
+            // ---- 后台静默刷新：更新内存 + sessionStorage，不重渲染当前视图 ----
+            function backgroundRefresh() {
+                getJSON(DATA_BASE + "categories.json")
+                    .then(function (root) {
+                        var categories = (root && root.categories) || [];
+                        if (categories.length) lastCategories = categories;
+                        return categories;
+                    })
+                    .catch(function () { return lastCategories || []; })
+                    .then(function (categories) {
+                        if (!categories.length) return null;
+                        return Promise.all(
+                            categories.map(function (cat) {
+                                return getJSON(DATA_BASE + cat.id + ".json")
+                                    .then(function (data) {
+                                        cache[cat.id] = Array.isArray(data) ? data : [];
+                                    })
+                                    .catch(function () { /* 保留旧缓存 */ });
+                            })
+                        );
+                    })
+                    .then(function () { saveToStorage(); })
+                    .catch(function (err) {
+                        console.warn("[wiki] 后台刷新失败:", err);
+                    });
+            }
+
+            // ---- 启动：优先从 sessionStorage 渲染，再后台静默刷新 ----
+            var stored = loadFromStorage();
+            if (stored && stored.categories.length) {
+                // 命中：把数据灌进内存 cache，然后立刻渲染
+                Object.keys(stored.entries).forEach(function (id) {
+                    cache[id] = stored.entries[id];
                 });
+                var counts = {};
+                stored.categories.forEach(function (c) {
+                    counts[c.id] = (cache[c.id] || []).length;
+                });
+                bootstrap(stored.categories, counts, true);
+                var savedAgo = Math.max(0, Math.round((Date.now() - stored.savedAt) / 1000));
+                console.info(
+                    "[wiki] 从 sessionStorage 渲染，" + savedAgo + " 秒前保存。" +
+                    "本地编辑 JSON 后想立刻看效果：" +
+                    "sessionStorage.removeItem('" + STORAGE_KEY + "') 然后刷新。"
+                );
+                backgroundRefresh();
+            } else {
+                fullLoad();
+            }
+
+            // bfcache 兜底：用浏览器后退/前进键切回时，JS 状态和 DOM 都还在，
+            // 不需要做任何事。这里只打个日志方便观察。
+            window.addEventListener("pageshow", function (e) {
+                if (e.persisted) {
+                    console.info("[wiki] 来自 bfcache，无需重新加载数据");
+                }
+            });
 
             // ---- 交互：切换栏目 ----
             $listEl.addEventListener("click", function (e) {
