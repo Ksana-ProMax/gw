@@ -37,15 +37,119 @@
         </a>
     </nav>
 
-    <main class="gw-page">
-        <article class="gw-card gw-empty">
-            <h1 class="gw-empty__title">百科</h1>
-            <p class="gw-empty__hint">这里即将上线一份围绕「Gathering Waves」的词条手册。</p>
-            <a class="gw-empty__back" href="index.html">
-                <i class="bi bi-arrow-left"></i>
-                <span>返回主页</span>
-            </a>
-        </article>
+    <main class="gw-page gw-page--wiki">
+        <!-- 1. 标题栏：顶部全宽 -->
+        <header class="gw-titlebar" aria-label="当前栏目标题">
+            <span class="gw-titlebar__icon" id="titlebarIcon" aria-hidden="true">
+                <i class="bi bi-stars"></i>
+            </span>
+            <div class="gw-titlebar__text">
+                <span class="gw-titlebar__crumb">百科</span>
+                <h1 class="gw-titlebar__title" id="titlebarTitle">幻想种图鉴</h1>
+            </div>
+            <div class="gw-titlebar__meta">
+                <span class="gw-titlebar__count" id="titlebarCount">3 条词条</span>
+            </div>
+        </header>
+
+        <!-- 2 + 3. 下方两栏：栏目列表 + 内容列表 -->
+        <div class="gw-wiki">
+            <!-- 2. 左侧：百科栏目列表 -->
+            <aside class="gw-sidebar" aria-label="百科栏目">
+                <div class="gw-sidebar__head">
+                    <span class="gw-sidebar__label">CATEGORIES</span>
+                    <h2 class="gw-sidebar__title">百科栏目</h2>
+                </div>
+                <ul class="gw-categories" id="categoryList" role="tablist">
+                    <li
+                        class="gw-categories__item is-active"
+                        data-category="bestiary"
+                        role="tab"
+                        aria-selected="true"
+                        tabindex="0"
+                    >
+                        <span class="gw-categories__icon"><i class="bi bi-stars"></i></span>
+                        <span class="gw-categories__name">幻想种图鉴</span>
+                        <span class="gw-categories__count">3</span>
+                    </li>
+                    <li
+                        class="gw-categories__item"
+                        data-category="geography"
+                        role="tab"
+                        aria-selected="false"
+                        tabindex="0"
+                    >
+                        <span class="gw-categories__icon"><i class="bi bi-globe-americas"></i></span>
+                        <span class="gw-categories__name">地理志</span>
+                        <span class="gw-categories__count">3</span>
+                    </li>
+                    <li
+                        class="gw-categories__item"
+                        data-category="resources"
+                        role="tab"
+                        aria-selected="false"
+                        tabindex="0"
+                    >
+                        <span class="gw-categories__icon"><i class="bi bi-gem"></i></span>
+                        <span class="gw-categories__name">资源志</span>
+                        <span class="gw-categories__count">3</span>
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- 3. 右侧：内容列表 -->
+            <section class="gw-content" aria-label="词条列表">
+                <div class="gw-content__head">
+                    <h2 class="gw-content__title">词条列表</h2>
+                    <div class="gw-content__filter" aria-hidden="true">
+                        <span class="gw-content__filter-label">排序</span>
+                        <span class="gw-content__filter-pill">最新</span>
+                    </div>
+                </div>
+                <div class="gw-entries" id="entryList">
+                    <!-- 默认渲染「幻想种图鉴」词条，JS 不可用时也能直接看到内容 -->
+                    <article class="gw-entry">
+                        <div class="gw-entry__head">
+                            <h3 class="gw-entry__title">海织者 · Waveweaver</h3>
+                            <span class="gw-entry__tag">海洋</span>
+                        </div>
+                        <p class="gw-entry__excerpt">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. 据信它们栖居于潮汐最深处的暗礁之下，能用鳍翼编织出永久流动的浪纹。每一只海织者的寿命都伴随着一次潮汐的回响，当它们的歌声消散时，海面便会出现一道由光构成的新海峡。
+                        </p>
+                        <span class="gw-entry__more">
+                            <span>查看详情</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </span>
+                    </article>
+                    <article class="gw-entry">
+                        <div class="gw-entry__head">
+                            <h3 class="gw-entry__title">苍雾鹿 · Mist Stag</h3>
+                            <span class="gw-entry__tag">森林</span>
+                        </div>
+                        <p class="gw-entry__excerpt">
+                            Nulla gravida orci a odio, nullam varius, turpis et commodo pharetra. 这种生物常年隐没于古林深处的雾带之中，鹿角顶端萦绕着不散的银白薄雾；凡是跟随之者，皆会在月圆之夜听见它们轻柔的鸣声回荡在山谷之间。
+                        </p>
+                        <span class="gw-entry__more">
+                            <span>查看详情</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </span>
+                    </article>
+                    <article class="gw-entry">
+                        <div class="gw-entry__head">
+                            <h3 class="gw-entry__title">裂空鹰 · Rift Eagle</h3>
+                            <span class="gw-entry__tag">天空</span>
+                        </div>
+                        <p class="gw-entry__excerpt">
+                            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia. 它们栖息在断裂的天穹之上，每一次振翅都伴随着一声细微的碎响；猎人们传说，捕获其掉落的羽毛，能够短暂地斩开空间，让持有者看见远方未曾抵达之地。
+                        </p>
+                        <span class="gw-entry__more">
+                            <span>查看详情</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </span>
+                    </article>
+                </div>
+            </section>
+        </div>
 
         <p class="gw-footer">© Gathering Waves · Built with Bootstrap 5</p>
     </main>
@@ -55,5 +159,164 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"
     ></script>
+    <script>
+        (function () {
+            "use strict";
+
+            // 百科栏目数据：3 条占位词条用于填充界面
+            const wikiData = {
+                bestiary: {
+                    title: "幻想种图鉴",
+                    icon: "bi-stars",
+                    countText: "3 条词条",
+                    entries: [
+                        {
+                            title: "海织者 · Waveweaver",
+                            tag: "海洋",
+                            excerpt:
+                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. 据信它们栖居于潮汐最深处的暗礁之下，能用鳍翼编织出永久流动的浪纹。每一只海织者的寿命都伴随着一次潮汐的回响，当它们的歌声消散时，海面便会出现一道由光构成的新海峡。"
+                        },
+                        {
+                            title: "苍雾鹿 · Mist Stag",
+                            tag: "森林",
+                            excerpt:
+                                "Nulla gravida orci a odio, nullam varius, turpis et commodo pharetra. 这种生物常年隐没于古林深处的雾带之中，鹿角顶端萦绕着不散的银白薄雾；凡是跟随之者，皆会在月圆之夜听见它们轻柔的鸣声回荡在山谷之间。"
+                        },
+                        {
+                            title: "裂空鹰 · Rift Eagle",
+                            tag: "天空",
+                            excerpt:
+                                "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia. 它们栖息在断裂的天穹之上，每一次振翅都伴随着一声细微的碎响；猎人们传说，捕获其掉落的羽毛，能够短暂地斩开空间，让持有者看见远方未曾抵达之地。"
+                        }
+                    ]
+                },
+                geography: {
+                    title: "地理志",
+                    icon: "bi-globe-americas",
+                    countText: "3 条词条",
+                    entries: [
+                        {
+                            title: "翡翠海湾 · Emerald Bay",
+                            tag: "海岸",
+                            excerpt:
+                                "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. 这片弧形海岸的潮汐呈翠绿色泽，每当清晨雾气尚未散尽时，远处的灯塔会在水面投下一道淡金的回路，仿佛在指引某艘永远不会抵达的船只。"
+                        },
+                        {
+                            title: "星落平原 · Starfall Plain",
+                            tag: "平原",
+                            excerpt:
+                                "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse. 这片辽阔的草原被一望无际的蓝色天幕覆盖，每隔数十年便会有陨星坠落此处，在地面砸出发光的浅坑，并留下一片可被牧民拾取的星砂。"
+                        },
+                        {
+                            title: "镜湖 · Mirror Lake",
+                            tag: "湖泊",
+                            excerpt:
+                                "At vero eos et accusamus et iusto odio dignissimos ducimus. 湖面平整如镜，能映出不属于这个世界的云朵；据说在某些无风的夜晚，湖底会出现另一个相似却相反的城镇轮廓，那里的灯火与现实完全相反地明灭着。"
+                        }
+                    ]
+                },
+                resources: {
+                    title: "资源志",
+                    icon: "bi-gem",
+                    countText: "3 条词条",
+                    entries: [
+                        {
+                            title: "月痕石 · Moonshard",
+                            tag: "矿石",
+                            excerpt:
+                                "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium. 这种半透明矿石仅在满月期间生成于潮间带的礁石缝隙间，研磨后可作为炼金核心，注入装备时会让持有者在黑夜里获得短暂的视野增幅。"
+                        },
+                        {
+                            title: "海蓝绒 · Seawool",
+                            tag: "织物",
+                            excerpt:
+                                "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit. 由海织者脱落鳍翼边缘的细丝所编织成的稀有织物，触感冰凉且带有微微盐味，被认为能在风暴中为穿戴者提供一层自然的风障。"
+                        },
+                        {
+                            title: "深潮木 · Deepwood",
+                            tag: "木材",
+                            excerpt:
+                                "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur. 仅生长在被潮汐反复冲刷的沿海红树林深处，木材在干燥后会显现深蓝色年轮纹路，常被用于制作可长时间漂浮于水面的轻质船板。"
+                        }
+                    ]
+                }
+            };
+
+            const $titleEl = document.getElementById("titlebarTitle");
+            const $countEl = document.getElementById("titlebarCount");
+            const $iconEl = document.getElementById("titlebarIcon");
+            const $listEl = document.getElementById("categoryList");
+            const $entriesEl = document.getElementById("entryList");
+
+            if (!$listEl || !$entriesEl) return;
+
+            function escapeHtml(str) {
+                return String(str).replace(/[&<>"']/g, function (c) {
+                    return ({
+                        "&": "&amp;",
+                        "<": "&lt;",
+                        ">": "&gt;",
+                        '"': "&quot;",
+                        "'": "&#39;"
+                    })[c];
+                });
+            }
+
+            function renderEntries(key) {
+                const data = wikiData[key];
+                if (!data) return;
+
+                // 1) 标题栏：图标 + 标题 + 词条数
+                $titleEl.textContent = data.title;
+                $countEl.textContent = data.countText;
+                $iconEl.innerHTML = '<i class="bi ' + escapeHtml(data.icon) + '"></i>';
+
+                // 2) 栏目列表 active 态
+                const items = $listEl.querySelectorAll(".gw-categories__item");
+                items.forEach(function (item) {
+                    const isActive = item.dataset.category === key;
+                    item.classList.toggle("is-active", isActive);
+                    item.setAttribute("aria-selected", isActive ? "true" : "false");
+                });
+
+                // 3) 内容列表（带淡入过渡）
+                $entriesEl.classList.add("is-swapping");
+                window.setTimeout(function () {
+                    $entriesEl.innerHTML = data.entries
+                        .map(function (entry) {
+                            return (
+                                '<article class="gw-entry">' +
+                                '<div class="gw-entry__head">' +
+                                '<h3 class="gw-entry__title">' + escapeHtml(entry.title) + "</h3>" +
+                                '<span class="gw-entry__tag">' + escapeHtml(entry.tag) + "</span>" +
+                                "</div>" +
+                                '<p class="gw-entry__excerpt">' + escapeHtml(entry.excerpt) + "</p>" +
+                                '<span class="gw-entry__more">' +
+                                "<span>查看详情</span>" +
+                                '<i class="bi bi-arrow-right"></i>' +
+                                "</span>" +
+                                "</article>"
+                            );
+                        })
+                        .join("");
+                    $entriesEl.classList.remove("is-swapping");
+                }, 180);
+            }
+
+            $listEl.addEventListener("click", function (e) {
+                const item = e.target.closest(".gw-categories__item");
+                if (item) renderEntries(item.dataset.category);
+            });
+
+            $listEl.addEventListener("keydown", function (e) {
+                if (e.key !== "Enter" && e.key !== " ") return;
+                const item = e.target.closest(".gw-categories__item");
+                if (item) {
+                    e.preventDefault();
+                    renderEntries(item.dataset.category);
+                }
+            });
+        })();
+    </script>
 </body>
 </html>
