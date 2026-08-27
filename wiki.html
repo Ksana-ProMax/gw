@@ -38,66 +38,36 @@
     </nav>
 
     <main class="gw-page gw-page--wiki">
-        <!-- 1. 标题栏：顶部全宽 -->
+        <!-- 1. 标题栏：顶部全宽，内容由 JS 从 categories.json + 词条总数填充 -->
         <header class="gw-titlebar" aria-label="当前栏目标题">
             <span class="gw-titlebar__icon" id="titlebarIcon" aria-hidden="true">
-                <i class="bi bi-stars"></i>
+                <i class="bi bi-book"></i>
             </span>
             <div class="gw-titlebar__text">
                 <span class="gw-titlebar__crumb">百科</span>
-                <h1 class="gw-titlebar__title" id="titlebarTitle">幻想种图鉴</h1>
+                <h1 class="gw-titlebar__title" id="titlebarTitle">加载中…</h1>
             </div>
             <div class="gw-titlebar__meta">
-                <span class="gw-titlebar__count" id="titlebarCount">3 条词条</span>
+                <span class="gw-titlebar__count" id="titlebarCount">-- 条词条</span>
             </div>
         </header>
 
         <!-- 2 + 3. 下方两栏：栏目列表 + 内容列表 -->
         <div class="gw-wiki">
-            <!-- 2. 左侧：百科栏目列表 -->
+            <!-- 2. 左侧：百科栏目列表，由 JS 渲染 -->
             <aside class="gw-sidebar" aria-label="百科栏目">
                 <div class="gw-sidebar__head">
                     <span class="gw-sidebar__label">CATEGORIES</span>
                     <h2 class="gw-sidebar__title">百科栏目</h2>
                 </div>
-                <ul class="gw-categories" id="categoryList" role="tablist">
-                    <li
-                        class="gw-categories__item is-active"
-                        data-category="bestiary"
-                        role="tab"
-                        aria-selected="true"
-                        tabindex="0"
-                    >
-                        <span class="gw-categories__icon"><i class="bi bi-stars"></i></span>
-                        <span class="gw-categories__name">幻想种图鉴</span>
-                        <span class="gw-categories__count">3</span>
-                    </li>
-                    <li
-                        class="gw-categories__item"
-                        data-category="geography"
-                        role="tab"
-                        aria-selected="false"
-                        tabindex="0"
-                    >
-                        <span class="gw-categories__icon"><i class="bi bi-globe-americas"></i></span>
-                        <span class="gw-categories__name">地理志</span>
-                        <span class="gw-categories__count">3</span>
-                    </li>
-                    <li
-                        class="gw-categories__item"
-                        data-category="resources"
-                        role="tab"
-                        aria-selected="false"
-                        tabindex="0"
-                    >
-                        <span class="gw-categories__icon"><i class="bi bi-gem"></i></span>
-                        <span class="gw-categories__name">资源志</span>
-                        <span class="gw-categories__count">3</span>
-                    </li>
+                <ul class="gw-categories" id="categoryList" role="tablist" aria-busy="true">
+                    <li class="gw-categories__skeleton" aria-hidden="true"></li>
+                    <li class="gw-categories__skeleton" aria-hidden="true"></li>
+                    <li class="gw-categories__skeleton" aria-hidden="true"></li>
                 </ul>
             </aside>
 
-            <!-- 3. 右侧：内容列表 -->
+            <!-- 3. 右侧：内容列表，由 JS 渲染 -->
             <section class="gw-content" aria-label="词条列表">
                 <div class="gw-content__head">
                     <h2 class="gw-content__title">词条列表</h2>
@@ -106,47 +76,10 @@
                         <span class="gw-content__filter-pill">最新</span>
                     </div>
                 </div>
-                <div class="gw-entries" id="entryList">
-                    <!-- 默认渲染「幻想种图鉴」词条，JS 不可用时也能直接看到内容 -->
-                    <article class="gw-entry">
-                        <div class="gw-entry__head">
-                            <h3 class="gw-entry__title">海织者 · Waveweaver</h3>
-                            <span class="gw-entry__tag">海洋</span>
-                        </div>
-                        <p class="gw-entry__excerpt">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. 据信它们栖居于潮汐最深处的暗礁之下，能用鳍翼编织出永久流动的浪纹。每一只海织者的寿命都伴随着一次潮汐的回响，当它们的歌声消散时，海面便会出现一道由光构成的新海峡。
-                        </p>
-                        <span class="gw-entry__more">
-                            <span>查看详情</span>
-                            <i class="bi bi-arrow-right"></i>
-                        </span>
-                    </article>
-                    <article class="gw-entry">
-                        <div class="gw-entry__head">
-                            <h3 class="gw-entry__title">苍雾鹿 · Mist Stag</h3>
-                            <span class="gw-entry__tag">森林</span>
-                        </div>
-                        <p class="gw-entry__excerpt">
-                            Nulla gravida orci a odio, nullam varius, turpis et commodo pharetra. 这种生物常年隐没于古林深处的雾带之中，鹿角顶端萦绕着不散的银白薄雾；凡是跟随之者，皆会在月圆之夜听见它们轻柔的鸣声回荡在山谷之间。
-                        </p>
-                        <span class="gw-entry__more">
-                            <span>查看详情</span>
-                            <i class="bi bi-arrow-right"></i>
-                        </span>
-                    </article>
-                    <article class="gw-entry">
-                        <div class="gw-entry__head">
-                            <h3 class="gw-entry__title">裂空鹰 · Rift Eagle</h3>
-                            <span class="gw-entry__tag">天空</span>
-                        </div>
-                        <p class="gw-entry__excerpt">
-                            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia. 它们栖息在断裂的天穹之上，每一次振翅都伴随着一声细微的碎响；猎人们传说，捕获其掉落的羽毛，能够短暂地斩开空间，让持有者看见远方未曾抵达之地。
-                        </p>
-                        <span class="gw-entry__more">
-                            <span>查看详情</span>
-                            <i class="bi bi-arrow-right"></i>
-                        </span>
-                    </article>
+                <div class="gw-entries" id="entryList" aria-busy="true">
+                    <div class="gw-entry__skeleton" aria-hidden="true"></div>
+                    <div class="gw-entry__skeleton" aria-hidden="true"></div>
+                    <div class="gw-entry__skeleton" aria-hidden="true"></div>
                 </div>
             </section>
         </div>
@@ -163,157 +96,233 @@
         (function () {
             "use strict";
 
-            // 百科栏目数据：3 条占位词条用于填充界面
-            const wikiData = {
-                bestiary: {
-                    title: "幻想种图鉴",
-                    icon: "bi-stars",
-                    countText: "3 条词条",
-                    entries: [
-                        {
-                            title: "海织者 · Waveweaver",
-                            tag: "海洋",
-                            excerpt:
-                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. 据信它们栖居于潮汐最深处的暗礁之下，能用鳍翼编织出永久流动的浪纹。每一只海织者的寿命都伴随着一次潮汐的回响，当它们的歌声消散时，海面便会出现一道由光构成的新海峡。"
-                        },
-                        {
-                            title: "苍雾鹿 · Mist Stag",
-                            tag: "森林",
-                            excerpt:
-                                "Nulla gravida orci a odio, nullam varius, turpis et commodo pharetra. 这种生物常年隐没于古林深处的雾带之中，鹿角顶端萦绕着不散的银白薄雾；凡是跟随之者，皆会在月圆之夜听见它们轻柔的鸣声回荡在山谷之间。"
-                        },
-                        {
-                            title: "裂空鹰 · Rift Eagle",
-                            tag: "天空",
-                            excerpt:
-                                "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia. 它们栖息在断裂的天穹之上，每一次振翅都伴随着一声细微的碎响；猎人们传说，捕获其掉落的羽毛，能够短暂地斩开空间，让持有者看见远方未曾抵达之地。"
-                        }
-                    ]
-                },
-                geography: {
-                    title: "地理志",
-                    icon: "bi-globe-americas",
-                    countText: "3 条词条",
-                    entries: [
-                        {
-                            title: "翡翠海湾 · Emerald Bay",
-                            tag: "海岸",
-                            excerpt:
-                                "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. 这片弧形海岸的潮汐呈翠绿色泽，每当清晨雾气尚未散尽时，远处的灯塔会在水面投下一道淡金的回路，仿佛在指引某艘永远不会抵达的船只。"
-                        },
-                        {
-                            title: "星落平原 · Starfall Plain",
-                            tag: "平原",
-                            excerpt:
-                                "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse. 这片辽阔的草原被一望无际的蓝色天幕覆盖，每隔数十年便会有陨星坠落此处，在地面砸出发光的浅坑，并留下一片可被牧民拾取的星砂。"
-                        },
-                        {
-                            title: "镜湖 · Mirror Lake",
-                            tag: "湖泊",
-                            excerpt:
-                                "At vero eos et accusamus et iusto odio dignissimos ducimus. 湖面平整如镜，能映出不属于这个世界的云朵；据说在某些无风的夜晚，湖底会出现另一个相似却相反的城镇轮廓，那里的灯火与现实完全相反地明灭着。"
-                        }
-                    ]
-                },
-                resources: {
-                    title: "资源志",
-                    icon: "bi-gem",
-                    countText: "3 条词条",
-                    entries: [
-                        {
-                            title: "月痕石 · Moonshard",
-                            tag: "矿石",
-                            excerpt:
-                                "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium. 这种半透明矿石仅在满月期间生成于潮间带的礁石缝隙间，研磨后可作为炼金核心，注入装备时会让持有者在黑夜里获得短暂的视野增幅。"
-                        },
-                        {
-                            title: "海蓝绒 · Seawool",
-                            tag: "织物",
-                            excerpt:
-                                "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit. 由海织者脱落鳍翼边缘的细丝所编织成的稀有织物，触感冰凉且带有微微盐味，被认为能在风暴中为穿戴者提供一层自然的风障。"
-                        },
-                        {
-                            title: "深潮木 · Deepwood",
-                            tag: "木材",
-                            excerpt:
-                                "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur. 仅生长在被潮汐反复冲刷的沿海红树林深处，木材在干燥后会显现深蓝色年轮纹路，常被用于制作可长时间漂浮于水面的轻质船板。"
-                        }
-                    ]
-                }
-            };
+            // 基础路径：所有 JSON 文件都放在 data/wiki/ 下
+            var DATA_BASE = "data/wiki/";
 
-            const $titleEl = document.getElementById("titlebarTitle");
-            const $countEl = document.getElementById("titlebarCount");
-            const $iconEl = document.getElementById("titlebarIcon");
-            const $listEl = document.getElementById("categoryList");
-            const $entriesEl = document.getElementById("entryList");
+            var $titleEl   = document.getElementById("titlebarTitle");
+            var $countEl   = document.getElementById("titlebarCount");
+            var $iconEl    = document.getElementById("titlebarIcon");
+            var $listEl    = document.getElementById("categoryList");
+            var $entriesEl = document.getElementById("entryList");
 
-            if (!$listEl || !$entriesEl) return;
+            // 当前激活的栏目 id
+            var activeId = null;
 
+            // ---- 工具 ----
             function escapeHtml(str) {
-                return String(str).replace(/[&<>"']/g, function (c) {
-                    return ({
-                        "&": "&amp;",
-                        "<": "&lt;",
-                        ">": "&gt;",
-                        '"': "&quot;",
-                        "'": "&#39;"
-                    })[c];
+                return String(str == null ? "" : str).replace(/[&<>"']/g, function (c) {
+                    return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
                 });
             }
 
-            function renderEntries(key) {
-                const data = wikiData[key];
-                if (!data) return;
-
-                // 1) 标题栏：图标 + 标题 + 词条数
-                $titleEl.textContent = data.title;
-                $countEl.textContent = data.countText;
-                $iconEl.innerHTML = '<i class="bi ' + escapeHtml(data.icon) + '"></i>';
-
-                // 2) 栏目列表 active 态
-                const items = $listEl.querySelectorAll(".gw-categories__item");
-                items.forEach(function (item) {
-                    const isActive = item.dataset.category === key;
-                    item.classList.toggle("is-active", isActive);
-                    item.setAttribute("aria-selected", isActive ? "true" : "false");
+            function getJSON(url) {
+                return fetch(url, { cache: "no-cache" }).then(function (resp) {
+                    if (!resp.ok) {
+                        throw new Error("HTTP " + resp.status + " · " + url);
+                    }
+                    return resp.json();
                 });
+            }
 
-                // 3) 内容列表（带淡入过渡）
+            function renderError(target, message, hint) {
+                target.setAttribute("aria-busy", "false");
+                target.innerHTML =
+                    '<div class="gw-state gw-state--error">' +
+                    '<i class="bi bi-exclamation-triangle"></i>' +
+                    '<p class="gw-state__msg">' + escapeHtml(message) + '</p>' +
+                    (hint ? '<p class="gw-state__hint">' + escapeHtml(hint) + '</p>' : "") +
+                    "</div>";
+            }
+
+            // ---- 渲染：标题栏 ----
+            function renderTitlebar(cat, count) {
+                $titleEl.textContent = cat.title;
+                $iconEl.innerHTML = '<i class="bi ' + escapeHtml(cat.icon || "bi-book") + '"></i>';
+                $countEl.textContent = count + " 条词条";
+            }
+
+            // ---- 渲染：侧边栏 ----
+            function renderSidebar(categories, counts) {
+                $listEl.setAttribute("aria-busy", "false");
+                $listEl.innerHTML = categories
+                    .map(function (cat) {
+                        var isActive = cat.id === activeId;
+                        return (
+                            '<li class="gw-categories__item' + (isActive ? " is-active" : "") + '"' +
+                            ' data-category="' + escapeHtml(cat.id) + '"' +
+                            ' role="tab" aria-selected="' + (isActive ? "true" : "false") + '"' +
+                            ' tabindex="0">' +
+                            '<span class="gw-categories__icon"><i class="bi ' +
+                            escapeHtml(cat.icon || "bi-book") + '"></i></span>' +
+                            '<span class="gw-categories__name">' + escapeHtml(cat.title) + '</span>' +
+                            '<span class="gw-categories__count">' +
+                            (counts[cat.id] != null ? counts[cat.id] : "…") +
+                            "</span>" +
+                            "</li>"
+                        );
+                    })
+                    .join("");
+            }
+
+            // ---- 渲染：词条列表 ----
+            function renderEntries(entries) {
+                $entriesEl.setAttribute("aria-busy", "false");
+                if (!entries.length) {
+                    $entriesEl.innerHTML =
+                        '<div class="gw-state gw-state--empty">' +
+                        '<i class="bi bi-inbox"></i>' +
+                        '<p class="gw-state__msg">该栏目下还没有词条</p>' +
+                        '<p class="gw-state__hint">在 data/wiki/' +
+                        '<code id="emptyCatId"></code>/ 目录里新建一个 JSON 文件并加入 index.json 即可。</p>' +
+                        "</div>";
+                    // 注入栏目 id，避免硬转义
+                    var node = document.getElementById("emptyCatId");
+                    if (node) node.textContent = activeId || "";
+                    return;
+                }
+                $entriesEl.innerHTML = entries
+                    .map(function (entry) {
+                        var fullTitle = entry.titleEn
+                            ? escapeHtml(entry.title) + " · " + escapeHtml(entry.titleEn)
+                            : escapeHtml(entry.title);
+                        var tag = entry.tag
+                            ? '<span class="gw-entry__tag">' + escapeHtml(entry.tag) + "</span>"
+                            : "";
+                        return (
+                            '<article class="gw-entry">' +
+                            '<div class="gw-entry__head">' +
+                            '<h3 class="gw-entry__title">' + fullTitle + "</h3>" +
+                            tag +
+                            "</div>" +
+                            '<p class="gw-entry__excerpt">' + escapeHtml(entry.excerpt || "") + "</p>" +
+                            '<span class="gw-entry__more">' +
+                            "<span>查看详情</span>" +
+                            '<i class="bi bi-arrow-right"></i>' +
+                            "</span>" +
+                            "</article>"
+                        );
+                    })
+                    .join("");
+            }
+
+            // ---- 加载一个栏目的词条 ----
+            function loadCategory(catId) {
+                $entriesEl.setAttribute("aria-busy", "true");
                 $entriesEl.classList.add("is-swapping");
-                window.setTimeout(function () {
-                    $entriesEl.innerHTML = data.entries
-                        .map(function (entry) {
-                            return (
-                                '<article class="gw-entry">' +
-                                '<div class="gw-entry__head">' +
-                                '<h3 class="gw-entry__title">' + escapeHtml(entry.title) + "</h3>" +
-                                '<span class="gw-entry__tag">' + escapeHtml(entry.tag) + "</span>" +
-                                "</div>" +
-                                '<p class="gw-entry__excerpt">' + escapeHtml(entry.excerpt) + "</p>" +
-                                '<span class="gw-entry__more">' +
-                                "<span>查看详情</span>" +
-                                '<i class="bi bi-arrow-right"></i>' +
-                                "</span>" +
-                                "</article>"
-                            );
-                        })
-                        .join("");
-                    $entriesEl.classList.remove("is-swapping");
-                }, 180);
+                // 骨架屏
+                $entriesEl.innerHTML =
+                    '<div class="gw-entry__skeleton" aria-hidden="true"></div>' +
+                    '<div class="gw-entry__skeleton" aria-hidden="true"></div>' +
+                    '<div class="gw-entry__skeleton" aria-hidden="true"></div>';
+
+                var indexUrl = DATA_BASE + catId + "/index.json";
+                getJSON(indexUrl)
+                    .then(function (files) {
+                        if (!Array.isArray(files)) {
+                            throw new Error("index.json 必须是文件名字符串数组");
+                        }
+                        return Promise.all(
+                            files.map(function (f) {
+                                return getJSON(DATA_BASE + catId + "/" + f).then(function (data) {
+                                    return { file: f, data: data };
+                                });
+                            })
+                        );
+                    })
+                    .then(function (results) {
+                        // 显示前先做一次 180ms 的淡出，给视觉一个过渡
+                        window.setTimeout(function () {
+                            renderEntries(results.map(function (r) { return r.data; }));
+                            $entriesEl.classList.remove("is-swapping");
+                        }, 180);
+                    })
+                    .catch(function (err) {
+                        console.error("[wiki] 加载栏目失败:", err);
+                        renderError(
+                            $entriesEl,
+                            "无法加载栏目「" + catId + "」的词条",
+                            "请确认 data/wiki/" + catId + "/ 目录存在，并通过本地 HTTP 服务访问页面。"
+                        );
+                    });
             }
 
+            // ---- 启动：拉取栏目清单 ----
+            getJSON(DATA_BASE + "categories.json")
+                .then(function (root) {
+                    var categories = (root && root.categories) || [];
+                    if (!categories.length) {
+                        renderError(
+                            $listEl,
+                            "data/wiki/categories.json 中没有栏目",
+                            "请在该文件中定义 categories 数组。"
+                        );
+                        return null;
+                    }
+                    // 并行拉取每个栏目的 index.json，用来在侧边栏显示词条数
+                    return Promise.all(
+                        categories.map(function (cat) {
+                            return getJSON(DATA_BASE + cat.id + "/index.json")
+                                .then(function (files) { return [cat.id, Array.isArray(files) ? files.length : 0]; })
+                                .catch(function () { return [cat.id, 0]; });
+                        })
+                    ).then(function (pairs) {
+                        var counts = {};
+                        pairs.forEach(function (p) { counts[p[0]] = p[1]; });
+
+                        activeId = categories[0].id;
+                        renderSidebar(categories, counts);
+                        renderTitlebar(categories[0], counts[activeId] || 0);
+                        loadCategory(activeId);
+                        return categories;
+                    });
+                })
+                .catch(function (err) {
+                    console.error("[wiki] 加载 categories.json 失败:", err);
+                    renderError(
+                        $listEl,
+                        "无法加载百科栏目清单",
+                        "常见原因：直接以 file:// 打开页面（浏览器禁止本地 fetch）。请运行本地 HTTP 服务，例如：\n  npx serve .\n  python -m http.server 8000"
+                    );
+                    // 内容区也提示一下
+                    renderError(
+                        $entriesEl,
+                        "等待栏目清单…",
+                        "栏目加载成功后此处会自动出现词条。"
+                    );
+                });
+
+            // ---- 交互：切换栏目 ----
             $listEl.addEventListener("click", function (e) {
-                const item = e.target.closest(".gw-categories__item");
-                if (item) renderEntries(item.dataset.category);
+                var item = e.target.closest(".gw-categories__item");
+                if (!item || item.classList.contains("is-active")) return;
+                activeId = item.dataset.category;
+
+                // 更新激活态
+                $listEl.querySelectorAll(".gw-categories__item").forEach(function (el) {
+                    var on = el === item;
+                    el.classList.toggle("is-active", on);
+                    el.setAttribute("aria-selected", on ? "true" : "false");
+                });
+
+                // 标题栏同步：需要从已渲染的 DOM 中读出 title 和 count
+                var name = item.querySelector(".gw-categories__name").textContent;
+                var icon = item.querySelector(".gw-categories__icon i").className
+                    .split(" ")
+                    .filter(function (c) { return c.indexOf("bi-") === 0; })[0] || "bi-book";
+                var count = item.querySelector(".gw-categories__count").textContent;
+                $titleEl.textContent = name;
+                $iconEl.innerHTML = '<i class="bi ' + escapeHtml(icon) + '"></i>';
+                $countEl.textContent = count + " 条词条";
+
+                loadCategory(activeId);
             });
 
             $listEl.addEventListener("keydown", function (e) {
                 if (e.key !== "Enter" && e.key !== " ") return;
-                const item = e.target.closest(".gw-categories__item");
+                var item = e.target.closest(".gw-categories__item");
                 if (item) {
                     e.preventDefault();
-                    renderEntries(item.dataset.category);
+                    item.click();
                 }
             });
         })();

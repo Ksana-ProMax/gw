@@ -1,0 +1,7 @@
+{
+    "categories": [
+        { "id": "bestiary",  "title": "幻想种图鉴", "icon": "bi-stars" },
+        { "id": "geography", "title": "地理志",     "icon": "bi-globe-americas" },
+        { "id": "resources", "title": "资源志",     "icon": "bi-gem" }
+    ]
+}
