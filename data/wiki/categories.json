@@ -1,6 +1,7 @@
 {
     "categories": [
         { "id": "game_process",  "title": "游戏基本流程", "icon": "bi-stars" },
-        { "id": "player_status", "title": "玩家相关状态与指标", "icon": "bi-globe-americas" }
+        { "id": "player_status", "title": "玩家相关状态与指标", "icon": "bi-globe-americas" },
+        { "id": "unit_status", "title": "单位相关状态与指标", "icon": "bi-globe-americas" }
     ]
 }
