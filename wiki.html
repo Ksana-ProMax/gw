@@ -190,23 +190,40 @@
                 }
                 $entriesEl.innerHTML = entries
                     .map(function (entry) {
-                        var fullTitle = entry.titleEn
-                            ? escapeHtml(entry.title) + " · " + escapeHtml(entry.titleEn)
-                            : escapeHtml(entry.title);
-                        var tag = entry.tag
-                            ? '<span class="gw-entry__tag">' + escapeHtml(entry.tag) + "</span>"
-                            : "";
+                        var titleHtml = '<h3 class="gw-entry__title">' + escapeHtml(entry.title || "") + "</h3>";
+
+                        // 图片：非空字符串才渲染（null / 空 / 缺字段都不显示）
+                        var imageHtml = "";
+                        if (typeof entry.image === "string" && entry.image.trim()) {
+                            imageHtml =
+                                '<div class="gw-entry__image">' +
+                                '<img src="' + escapeHtml(entry.image) + '" alt="' + escapeHtml(entry.title || "") + '" loading="lazy" />' +
+                                "</div>";
+                        }
+
+                        // content 允许多行：先 escapeHtml，再把 \n 还原成 <br> 即可
+                        var contentHtml =
+                            '<div class="gw-entry__content">' +
+                            escapeHtml(entry.content || "").replace(/\n/g, "<br>") +
+                            "</div>";
+
+                        // notes：非空才渲染，整块放进带黄边浅黄底的容器
+                        var notesHtml = "";
+                        if (typeof entry.notes === "string" && entry.notes.trim()) {
+                            notesHtml =
+                                '<div class="gw-entry__notes">' +
+                                escapeHtml(entry.notes).replace(/\n/g, "<br>") +
+                                "</div>";
+                        }
+
                         return (
                             '<article class="gw-entry">' +
-                            '<div class="gw-entry__head">' +
-                            '<h3 class="gw-entry__title">' + fullTitle + "</h3>" +
-                            tag +
+                            '<div class="gw-entry__head">' + titleHtml + "</div>" +
+                            '<div class="gw-entry__body">' +
+                            contentHtml +
+                            imageHtml +
                             "</div>" +
-                            '<p class="gw-entry__excerpt">' + escapeHtml(entry.excerpt || "") + "</p>" +
-                            '<span class="gw-entry__more">' +
-                            "<span>查看详情</span>" +
-                            '<i class="bi bi-arrow-right"></i>' +
-                            "</span>" +
+                            notesHtml +
                             "</article>"
                         );
                     })
