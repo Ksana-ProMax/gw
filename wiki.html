@@ -87,6 +87,13 @@
         <p class="gw-footer">© Gathering Waves · Built with Bootstrap 5</p>
     </main>
 
+    <!-- 图片灯箱：点击词条图片放大，点击任意位置关闭 -->
+    <div class="gw-lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="图片预览">
+        <div class="gw-lightbox__frame">
+            <img class="gw-lightbox__img" id="lightboxImg" src="" alt="" />
+        </div>
+    </div>
+
     <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
@@ -450,6 +457,45 @@
                     item.click();
                 }
             });
+
+            // ---- 图片灯箱 ----
+            // 点击词条缩略图打开；打开状态下点击灯箱任意位置（含图片）即关闭。
+            (function setupLightbox() {
+                var $lightbox = document.getElementById("lightbox");
+                var $lightboxImg = document.getElementById("lightboxImg");
+                if (!$lightbox || !$lightboxImg) return;
+
+                function openLightbox(src, alt) {
+                    $lightboxImg.src = src;
+                    $lightboxImg.alt = alt || "";
+                    $lightbox.classList.add("is-open");
+                    $lightbox.setAttribute("aria-hidden", "false");
+                    // 锁滚动，避免背景被一起滚
+                    document.body.style.overflow = "hidden";
+                }
+
+                function closeLightbox() {
+                    if (!$lightbox.classList.contains("is-open")) return;
+                    $lightbox.classList.remove("is-open");
+                    $lightbox.setAttribute("aria-hidden", "true");
+                    // 清掉 src，大图关闭后不再常驻内存
+                    $lightboxImg.removeAttribute("src");
+                    $lightboxImg.alt = "";
+                    document.body.style.overflow = "";
+                }
+
+                // 事件委托：点击词条图片时打开
+                $entriesEl.addEventListener("click", function (e) {
+                    var imgWrap = e.target.closest(".gw-entry__image");
+                    if (!imgWrap) return;
+                    var img = imgWrap.querySelector("img");
+                    if (!img || !img.src) return;
+                    openLightbox(img.src, img.alt);
+                });
+
+                // 灯箱内任意位置点击都关闭（backdrop / 白色 frame / 图片本身）
+                $lightbox.addEventListener("click", closeLightbox);
+            })();
         })();
     </script>
 </body>
