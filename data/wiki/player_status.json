@@ -2,7 +2,7 @@
     {
         "title": "手牌、卡组",
         "content": "玩家持有的手牌数、卡组与弃置区的卡牌的统计。",
-        "image": null,
+        "image": "data/image/player-status.png",
         "notes": null
     },
     {
