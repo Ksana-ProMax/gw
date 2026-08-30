@@ -1,7 +1,6 @@
 {
     "categories": [
-        { "id": "bestiary",  "title": "幻想种图鉴", "icon": "bi-stars" },
-        { "id": "geography", "title": "地理志",     "icon": "bi-globe-americas" },
-        { "id": "resources", "title": "资源志",     "icon": "bi-gem" }
+        { "id": "game_process",  "title": "游戏基本流程", "icon": "bi-stars" },
+        { "id": "player_status", "title": "玩家相关状态与指标", "icon": "bi-globe-americas" }
     ]
 }
