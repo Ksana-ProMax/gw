@@ -1,0 +1,110 @@
+[
+    {
+        "title": "保护者",
+        "content": "如果对方单位可以攻击自己，则必须优先攻击自己，无法绕过自己去攻击其他目标。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "屏障",
+        "content": "自己处于前排时，处于自己后方的后排角色无法被对方指定为攻击或法术的目标，相当于为后排队友挡住所有指向性的攻击与技能。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "穿透",
+        "content": "自己主动攻击并击破对方角色时，溢出的伤害会加算到对方后排的角色上，使超出部分继续向后溅射。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "连击",
+        "content": "自己在本回合内击破对方角色时，可以立即进行一次额外的攻击，本回合内可多次触发。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "旋风",
+        "content": "自己处于前排时，可以直接攻击对方的后排角色。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "嗜血",
+        "content": "自己对对方角色造成伤害后，会恢复等同于本次伤害数值的体力，无论自己还是对方受到伤害都能触发。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "疾速",
+        "content": "自己召唤到场上的当回合就可以直接发动攻击，不需要等待；自己回合内完成移动之后，依旧可以继续进行攻击，不会因移动而失去攻击机会。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "压制",
+        "content": "自己主动攻击时，会优先完成自己的攻击结算并击倒目标，然后再结算对方的反击，避免被对方反击反制。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "神佑",
+        "content": "自己不会受到来自法术牌造成的任何伤害，但对来自角色攻击和其他来源的伤害没有减免作用。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "圣洁",
+        "content": "自己免疫任何状态标记，无法被附加异常状态或特殊状态，对应的附加效果会被直接拒绝。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "虚无",
+        "content": "自己处于后排时，无法被对方指定为攻击或法术的目标，但离开后排后该保护会失效。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "横扫",
+        "content": "主动攻击并对目标造成伤害后，会同时对目标左右两侧的相邻角色造成等量的伤害。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "法术重击",
+        "content": "使法术伤害的伤害量获得提升，1点法术重击提升1点伤害。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "治疗强化",
+        "content": "我方玩家的治疗效果获得提升，1点治疗强化提升1点治疗效果。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "笨重",
+        "content": "自己无法攻击对方的后排角色，攻击目标被限制在前排范围内。即便持有旋风也无法突破这一限制。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "先锋",
+        "content": "自己只能在我方场地的前排进行召唤和移动，无法被部署或移动到后排。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "无法攻击",
+        "content": "角色无法主动发起攻击。",
+        "image": null,
+        "notes": null
+    },
+    {
+        "title": "无法移动",
+        "content": "角色无法主动进行移动，只能停留在被部署的位置上。",
+        "image": null,
+        "notes": null
+    }
+]
