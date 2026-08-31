@@ -3,6 +3,7 @@
         { "id": "game_process",  "title": "游戏基本流程", "icon": "bi-stars" },
         { "id": "player_status", "title": "玩家相关状态与指标", "icon": "bi-stars" },
         { "id": "unit_status", "title": "单位相关状态与指标", "icon": "bi-stars" },
-        { "id": "special_status_summary", "title": "特殊状态", "icon": "bi-stars" }
+        { "id": "special_status_summary", "title": "特殊状态", "icon": "bi-stars" },
+        { "id": "ability_token_summary", "title": "特技", "icon": "bi-stars" }
     ]
 }
