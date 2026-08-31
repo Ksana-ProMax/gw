@@ -531,6 +531,31 @@ body {
     display: none;
 }
 
+/* 搜索栏在侧边栏里的紧凑版：缩外边距、缩圆角、缩图标，与栏目列表更协调 */
+.gw-sidebar .gw-search {
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    border-radius: 18px;
+}
+
+.gw-sidebar .gw-search__icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+}
+
+.gw-sidebar .gw-search__input {
+    font-size: 0.95rem;
+    padding: 2px 0;
+}
+
+.gw-sidebar .gw-search__clear {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+}
+
 /* 搜索结果中的栏目分组小标题 */
 .gw-search-group + .gw-search-group {
     margin-top: 28px;

@@ -38,31 +38,6 @@
     </nav>
 
     <main class="gw-page gw-page--wiki">
-        <!-- 0. 搜索栏：所有词条之上，输入关键词按回车进行搜索；清空后恢复 -->
-        <form class="gw-search" id="searchForm" role="search" aria-label="词条搜索">
-            <span class="gw-search__icon" aria-hidden="true">
-                <i class="bi bi-search"></i>
-            </span>
-            <input
-                type="search"
-                class="gw-search__input"
-                id="searchInput"
-                placeholder="搜索词条标题或内容…  按回车"
-                aria-label="搜索词条"
-                autocomplete="off"
-                spellcheck="false"
-            />
-            <button
-                type="button"
-                class="gw-search__clear"
-                id="searchClear"
-                aria-label="清空搜索"
-                hidden
-            >
-                <i class="bi bi-x-circle-fill"></i>
-            </button>
-        </form>
-
         <!-- 1. 标题栏：顶部全宽，内容由 JS 从 categories.json + 词条总数填充 -->
         <header class="gw-titlebar" aria-label="当前栏目标题">
             <span class="gw-titlebar__icon" id="titlebarIcon" aria-hidden="true">
@@ -85,6 +60,30 @@
                     <span class="gw-sidebar__label">CATEGORIES</span>
                     <h2 class="gw-sidebar__title">百科栏目</h2>
                 </div>
+                <!-- 搜索栏：放在侧边栏内，「百科栏目」标题之下、所有栏目之上 -->
+                <form class="gw-search" id="searchForm" role="search" aria-label="词条搜索">
+                    <span class="gw-search__icon" aria-hidden="true">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input
+                        type="search"
+                        class="gw-search__input"
+                        id="searchInput"
+                        placeholder="搜索词条…  按回车"
+                        aria-label="搜索词条"
+                        autocomplete="off"
+                        spellcheck="false"
+                    />
+                    <button
+                        type="button"
+                        class="gw-search__clear"
+                        id="searchClear"
+                        aria-label="清空搜索"
+                        hidden
+                    >
+                        <i class="bi bi-x-circle-fill"></i>
+                    </button>
+                </form>
                 <ul class="gw-categories" id="categoryList" role="tablist" aria-busy="true">
                     <li class="gw-categories__skeleton" aria-hidden="true"></li>
                     <li class="gw-categories__skeleton" aria-hidden="true"></li>
