@@ -38,6 +38,31 @@
     </nav>
 
     <main class="gw-page gw-page--wiki">
+        <!-- 0. 搜索栏：所有词条之上，输入关键词按回车进行搜索；清空后恢复 -->
+        <form class="gw-search" id="searchForm" role="search" aria-label="词条搜索">
+            <span class="gw-search__icon" aria-hidden="true">
+                <i class="bi bi-search"></i>
+            </span>
+            <input
+                type="search"
+                class="gw-search__input"
+                id="searchInput"
+                placeholder="搜索词条标题或内容…  按回车"
+                aria-label="搜索词条"
+                autocomplete="off"
+                spellcheck="false"
+            />
+            <button
+                type="button"
+                class="gw-search__clear"
+                id="searchClear"
+                aria-label="清空搜索"
+                hidden
+            >
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+        </form>
+
         <!-- 1. 标题栏：顶部全宽，内容由 JS 从 categories.json + 词条总数填充 -->
         <header class="gw-titlebar" aria-label="当前栏目标题">
             <span class="gw-titlebar__icon" id="titlebarIcon" aria-hidden="true">
@@ -111,6 +136,10 @@
             var $iconEl    = document.getElementById("titlebarIcon");
             var $listEl    = document.getElementById("categoryList");
             var $entriesEl = document.getElementById("entryList");
+            var $titlebar  = $titleEl ? $titleEl.closest(".gw-titlebar") : null;
+            var $searchForm  = document.getElementById("searchForm");
+            var $searchInput = document.getElementById("searchInput");
+            var $searchClear = document.getElementById("searchClear");
 
             // 当前激活的栏目 id
             var activeId = null;
@@ -118,6 +147,13 @@
             var cache = {};
             // 最近一次从网络加载到的 categories 列表，写回 sessionStorage 时用
             var lastCategories = null;
+            // 搜索状态
+            var isSearching = false;
+            var searchQuery = "";
+            // 搜索结果：catId -> 命中词条数组（空对象表示无任何命中）
+            var searchMatches = {};
+            // 进入搜索前记住的栏目，clearSearch 时回到这里
+            var preSearchActiveId = null;
 
             // sessionStorage 缓存配置。数据很小（4 个 JSON 不到 4KB），
             // 5 分钟内认为缓存是新鲜的：够用，又不会让本地编辑后一直看不到更新。
@@ -158,11 +194,16 @@
             }
 
             // ---- 渲染：侧边栏 ----
-            function renderSidebar(categories, counts) {
+            // activeOverride:
+            //   省略 → 用全局 activeId（默认行为）
+            //   null  → 不点亮任何栏目（搜索未锁定到具体栏目时用）
+            //   具体 id → 强制点亮该栏目
+            function renderSidebar(categories, counts, activeOverride) {
                 $listEl.setAttribute("aria-busy", "false");
+                var effectiveActive = (activeOverride === undefined) ? activeId : activeOverride;
                 $listEl.innerHTML = categories
                     .map(function (cat) {
-                        var isActive = cat.id === activeId;
+                        var isActive = cat.id === effectiveActive;
                         return (
                             '<li class="gw-categories__item' + (isActive ? " is-active" : "") + '"' +
                             ' data-category="' + escapeHtml(cat.id) + '"' +
@@ -180,6 +221,46 @@
                     .join("");
             }
 
+            // ---- 渲染：单条词条卡片（搜索结果与栏目列表都复用） ----
+            function entryCardHTML(entry) {
+                var titleHtml = '<h3 class="gw-entry__title">' + escapeHtml(entry.title || "") + "</h3>";
+
+                // 图片：非空字符串才渲染（null / 空 / 缺字段都不显示）
+                var imageHtml = "";
+                if (typeof entry.image === "string" && entry.image.trim()) {
+                    imageHtml =
+                        '<div class="gw-entry__image">' +
+                        '<img src="' + escapeHtml(entry.image) + '" alt="' + escapeHtml(entry.title || "") + '" loading="lazy" />' +
+                        "</div>";
+                }
+
+                // content 允许多行：先 escapeHtml，再把 \n 还原成 <br> 即可
+                var contentHtml =
+                    '<div class="gw-entry__content">' +
+                    escapeHtml(entry.content || "").replace(/\n/g, "<br>") +
+                    "</div>";
+
+                // notes：非空才渲染，整块放进带黄边浅黄底的容器
+                var notesHtml = "";
+                if (typeof entry.notes === "string" && entry.notes.trim()) {
+                    notesHtml =
+                        '<div class="gw-entry__notes">' +
+                        escapeHtml(entry.notes).replace(/\n/g, "<br>") +
+                        "</div>";
+                }
+
+                return (
+                    '<article class="gw-entry">' +
+                    '<div class="gw-entry__head">' + titleHtml + "</div>" +
+                    '<div class="gw-entry__body">' +
+                    contentHtml +
+                    imageHtml +
+                    "</div>" +
+                    notesHtml +
+                    "</article>"
+                );
+            }
+
             // ---- 渲染：词条列表 ----
             function renderEntries(entries) {
                 $entriesEl.setAttribute("aria-busy", "false");
@@ -195,46 +276,7 @@
                     if (node) node.textContent = activeId || "";
                     return;
                 }
-                $entriesEl.innerHTML = entries
-                    .map(function (entry) {
-                        var titleHtml = '<h3 class="gw-entry__title">' + escapeHtml(entry.title || "") + "</h3>";
-
-                        // 图片：非空字符串才渲染（null / 空 / 缺字段都不显示）
-                        var imageHtml = "";
-                        if (typeof entry.image === "string" && entry.image.trim()) {
-                            imageHtml =
-                                '<div class="gw-entry__image">' +
-                                '<img src="' + escapeHtml(entry.image) + '" alt="' + escapeHtml(entry.title || "") + '" loading="lazy" />' +
-                                "</div>";
-                        }
-
-                        // content 允许多行：先 escapeHtml，再把 \n 还原成 <br> 即可
-                        var contentHtml =
-                            '<div class="gw-entry__content">' +
-                            escapeHtml(entry.content || "").replace(/\n/g, "<br>") +
-                            "</div>";
-
-                        // notes：非空才渲染，整块放进带黄边浅黄底的容器
-                        var notesHtml = "";
-                        if (typeof entry.notes === "string" && entry.notes.trim()) {
-                            notesHtml =
-                                '<div class="gw-entry__notes">' +
-                                escapeHtml(entry.notes).replace(/\n/g, "<br>") +
-                                "</div>";
-                        }
-
-                        return (
-                            '<article class="gw-entry">' +
-                            '<div class="gw-entry__head">' + titleHtml + "</div>" +
-                            '<div class="gw-entry__body">' +
-                            contentHtml +
-                            imageHtml +
-                            "</div>" +
-                            notesHtml +
-                            "</article>"
-                        );
-                    })
-                    .join("");
+                $entriesEl.innerHTML = entries.map(entryCardHTML).join("");
             }
 
             // ---- 取一个栏目的词条（带缓存） ----
@@ -245,6 +287,152 @@
                     cache[catId] = arr;
                     return arr;
                 });
+            }
+
+            // ---- 搜索：判定单条词条是否命中关键词 ----
+            // 在 title / content / notes 三个文本字段里做不区分大小写的子串匹配
+            function entryMatchesQuery(entry, q) {
+                if (!q) return true;
+                if ((entry.title   || "").toLowerCase().indexOf(q) !== -1) return true;
+                if ((entry.content || "").toLowerCase().indexOf(q) !== -1) return true;
+                if ((entry.notes   || "").toLowerCase().indexOf(q) !== -1) return true;
+                return false;
+            }
+
+            // ---- 搜索结果渲染：按栏目分组，每组下挂着命中词条 ----
+            // matchesByCategory: { catId: [entry, ...] }
+            // 用 entryCardHTML 复用现有卡片样式，外部包一层栏目标题
+            function renderSearchResults(matchesByCategory) {
+                var ids = Object.keys(matchesByCategory);
+                var total = 0;
+                ids.forEach(function (id) { total += (matchesByCategory[id] || []).length; });
+
+                $entriesEl.setAttribute("aria-busy", "false");
+
+                if (total === 0) {
+                    $entriesEl.innerHTML =
+                        '<div class="gw-state gw-state--no-results">' +
+                        '<i class="bi bi-search"></i>' +
+                        '<p class="gw-state__msg">没有找到匹配「' + escapeHtml(searchQuery) +
+                        '」的词条</p>' +
+                        '<p class="gw-state__hint">试试换一个关键词，或清空搜索查看全部栏目</p>' +
+                        "</div>";
+                    return;
+                }
+
+                // 按 lastCategories 的原始顺序输出分组，保证展示稳定
+                var orderedIds = (lastCategories || [])
+                    .map(function (c) { return c.id; })
+                    .filter(function (id) { return matchesByCategory[id] && matchesByCategory[id].length; });
+
+                // 容错：万一 lastCategories 还没就绪、或者有命中不在分类里，再补一轮
+                ids.forEach(function (id) {
+                    if (orderedIds.indexOf(id) === -1) orderedIds.push(id);
+                });
+
+                var html = orderedIds.map(function (catId) {
+                    var cat = (lastCategories || []).find(function (c) { return c.id === catId; });
+                    var title = cat ? cat.title : catId;
+                    var icon  = cat && cat.icon ? cat.icon : "bi-book";
+                    var entries = matchesByCategory[catId] || [];
+                    return (
+                        '<section class="gw-search-group" data-category="' + escapeHtml(catId) + '">' +
+                        '<h3 class="gw-search-group__title">' +
+                        '<i class="bi ' + escapeHtml(icon) + '"></i>' +
+                        '<span>' + escapeHtml(title) + '</span>' +
+                        '<span class="gw-search-group__count">' + entries.length + '</span>' +
+                        '</h3>' +
+                        entries.map(entryCardHTML).join("") +
+                        '</section>'
+                    );
+                }).join("");
+
+                $entriesEl.innerHTML = html;
+            }
+
+            // ---- 执行搜索 ----
+            // query: 用户输入的原始字符串；空 / 空白会直接走 clearSearch
+            function performSearch(query) {
+                var q = (query || "").trim();
+                if (!q) {
+                    clearSearch();
+                    return;
+                }
+
+                isSearching = true;
+                searchQuery = q;
+                preSearchActiveId = activeId;
+
+                var lowerQ = q.toLowerCase();
+                var matches = {};
+                var total = 0;
+                Object.keys(cache).forEach(function (catId) {
+                    var hits = (cache[catId] || []).filter(function (entry) {
+                        return entryMatchesQuery(entry, lowerQ);
+                    });
+                    if (hits.length) {
+                        matches[catId] = hits;
+                        total += hits.length;
+                    }
+                });
+                searchMatches = matches;
+
+                // 左侧栏目：只保留有命中的，数字也改成命中数
+                var filteredCats = (lastCategories || []).filter(function (cat) {
+                    return matches[cat.id] && matches[cat.id].length;
+                });
+                var matchCounts = {};
+                Object.keys(matches).forEach(function (id) { matchCounts[id] = matches[id].length; });
+                renderSidebar(filteredCats, matchCounts, null);
+
+                // 标题栏切到搜索态
+                if ($titlebar) $titlebar.classList.add("is-searching");
+                $titleEl.textContent = "搜索结果";
+                $iconEl.innerHTML = '<i class="bi bi-search"></i>';
+                $countEl.textContent = total + " 条匹配";
+
+                // 右侧内容：按栏目分组展示所有命中
+                renderSearchResults(matches);
+
+                // 清空按钮可见
+                if ($searchClear) $searchClear.hidden = false;
+            }
+
+            // ---- 清空搜索：恢复全部栏目，回到搜索前的 activeId ----
+            function clearSearch() {
+                if (!isSearching) {
+                    // 即使没在搜索中，也把搜索栏的可见状态归位
+                    if ($searchInput) $searchInput.value = "";
+                    if ($searchClear) $searchClear.hidden = true;
+                    return;
+                }
+
+                isSearching = false;
+                searchQuery = "";
+                searchMatches = {};
+                if ($searchInput) $searchInput.value = "";
+                if ($searchClear) $searchClear.hidden = true;
+                if ($titlebar) $titlebar.classList.remove("is-searching");
+
+                // 恢复 activeId：优先回到搜索前记录的栏目；缺失则退回第一个
+                if (preSearchActiveId && (lastCategories || []).some(function (c) { return c.id === preSearchActiveId; })) {
+                    activeId = preSearchActiveId;
+                } else {
+                    activeId = (lastCategories && lastCategories[0]) ? lastCategories[0].id : null;
+                }
+                preSearchActiveId = null;
+
+                // 重新渲染左侧完整栏目（使用各栏目真实条数）
+                var counts = {};
+                Object.keys(cache).forEach(function (id) { counts[id] = (cache[id] || []).length; });
+                renderSidebar(lastCategories || [], counts);
+
+                // 标题栏与右侧内容都回到 activeId 栏目
+                if (activeId) {
+                    var activeCat = (lastCategories || []).find(function (c) { return c.id === activeId; });
+                    if (activeCat) renderTitlebar(activeCat, counts[activeId] || 0);
+                    loadCategory(activeId, { skipAnimation: true });
+                }
             }
 
             // ---- 切换栏目（带 180ms 淡入） ----
@@ -428,8 +616,42 @@
             // ---- 交互：切换栏目 ----
             $listEl.addEventListener("click", function (e) {
                 var item = e.target.closest(".gw-categories__item");
-                if (!item || item.classList.contains("is-active")) return;
-                activeId = item.dataset.category;
+                if (!item) return;
+                var clickedId = item.dataset.category;
+
+                // 搜索模式下：点击栏目 = 在搜索结果中锁定到该栏目
+                if (isSearching) {
+                    var hits = searchMatches[clickedId];
+                    if (!hits || !hits.length) return;
+                    if (item.classList.contains("is-active")) return;
+
+                    $listEl.querySelectorAll(".gw-categories__item").forEach(function (el) {
+                        var on = el === item;
+                        el.classList.toggle("is-active", on);
+                        el.setAttribute("aria-selected", on ? "true" : "false");
+                    });
+
+                    activeId = clickedId;
+                    // 标题栏在搜索态下也展示该栏目 + 命中数
+                    var cat = (lastCategories || []).find(function (c) { return c.id === clickedId; });
+                    if (cat) {
+                        $titleEl.textContent = "搜索 · " + cat.title;
+                        $iconEl.innerHTML = '<i class="bi ' + escapeHtml(cat.icon || "bi-book") + '"></i>';
+                    } else {
+                        $titleEl.textContent = "搜索结果";
+                        $iconEl.innerHTML = '<i class="bi bi-search"></i>';
+                    }
+                    $countEl.textContent = hits.length + " 条匹配";
+
+                    var single = {};
+                    single[clickedId] = hits;
+                    renderSearchResults(single);
+                    return;
+                }
+
+                // 正常模式下：切换栏目
+                if (item.classList.contains("is-active")) return;
+                activeId = clickedId;
 
                 $listEl.querySelectorAll(".gw-categories__item").forEach(function (el) {
                     var on = el === item;
@@ -457,6 +679,39 @@
                     item.click();
                 }
             });
+
+            // ---- 交互：搜索栏 ----
+            // 仅在数据加载完（lastCategories 就绪）后才允许提交，避免空 cache 时搜出空结果
+            if ($searchForm) {
+                $searchForm.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    if (!lastCategories) return;
+                    performSearch($searchInput ? $searchInput.value : "");
+                });
+
+                // 输入框内容变化时，控制 X 按钮的可见性
+                if ($searchInput) {
+                    $searchInput.addEventListener("input", function () {
+                        if (!$searchClear) return;
+                        $searchClear.hidden = !$searchInput.value;
+                    });
+
+                    // Esc 直接清空并退出搜索
+                    $searchInput.addEventListener("keydown", function (e) {
+                        if (e.key === "Escape") {
+                            e.preventDefault();
+                            clearSearch();
+                        }
+                    });
+                }
+
+                if ($searchClear) {
+                    $searchClear.addEventListener("click", function () {
+                        clearSearch();
+                        if ($searchInput) $searchInput.focus();
+                    });
+                }
+            }
 
             // ---- 图片灯箱 ----
             // 点击词条缩略图打开；打开状态下点击灯箱任意位置（含图片）即关闭。

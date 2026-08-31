@@ -425,6 +425,195 @@ body {
     }
 }
 
+/* ---- 搜索栏：所有词条之上 ---- */
+.gw-search {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px clamp(18px, 2.5vw, 24px);
+    margin-bottom: 20px;
+    background: var(--gw-card-bg);
+    border: 1px solid var(--gw-card-border);
+    border-radius: 24px;
+    box-shadow:
+        0 24px 50px -22px rgba(15, 23, 42, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(10px) saturate(140%);
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+    transition:
+        box-shadow 0.3s ease,
+        transform 0.3s ease;
+}
+
+.gw-search:focus-within {
+    box-shadow:
+        0 24px 50px -22px rgba(15, 23, 42, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7),
+        0 0 0 3px rgba(99, 102, 241, 0.28);
+}
+
+.gw-search__icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #4338ca 0%, #db2777 55%, #f59e0b 100%);
+    color: #ffffff;
+    font-size: 0.98rem;
+    box-shadow:
+        0 8px 18px -8px rgba(67, 56, 202, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.gw-search__input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--gw-text);
+    font: inherit;
+    font-size: 1rem;
+    padding: 4px 0;
+    /* 去掉浏览器默认的 search input 外观（含 X 按钮），用我们自己的 */
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.gw-search__input::placeholder {
+    color: var(--gw-text-muted);
+    opacity: 0.75;
+}
+
+.gw-search__input::-webkit-search-decoration,
+.gw-search__input::-webkit-search-cancel-button,
+.gw-search__input::-webkit-search-results-button,
+.gw-search__input::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.gw-search__clear {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    padding: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--gw-text-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.gw-search__clear:hover {
+    background-color: rgba(31, 41, 55, 0.1);
+    color: #1e1b4b;
+}
+
+.gw-search__clear:focus-visible {
+    outline: none;
+    background-color: rgba(31, 41, 55, 0.12);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.35);
+}
+
+.gw-search__clear[hidden] {
+    display: none;
+}
+
+/* 搜索结果中的栏目分组小标题 */
+.gw-search-group + .gw-search-group {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px dashed rgba(31, 41, 55, 0.14);
+}
+
+.gw-search-group__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 16px 0;
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: #1e1b4b;
+}
+
+.gw-search-group__title > i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    background: rgba(79, 70, 229, 0.12);
+    color: #4338ca;
+    font-size: 0.88rem;
+}
+
+.gw-search-group__count {
+    margin-left: auto;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: rgba(31, 41, 55, 0.08);
+    color: var(--gw-text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+/* 搜索时无任何命中：右侧内容区与左侧空态 */
+.gw-state--no-results {
+    text-align: center;
+    padding: 60px 24px;
+}
+
+.gw-state--no-results .bi {
+    font-size: 2.4rem;
+    color: rgba(31, 41, 55, 0.35);
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+.gw-state--no-results .gw-state__msg {
+    margin: 0;
+    color: var(--gw-text);
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.gw-state--no-results .gw-state__hint {
+    margin: 6px 0 0 0;
+    color: var(--gw-text-muted);
+    font-size: 0.9rem;
+}
+
+/* 搜索无命中时左侧栏目的占位提示 */
+.gw-categories__empty {
+    padding: 16px 14px;
+    color: var(--gw-text-muted);
+    font-size: 0.88rem;
+    text-align: center;
+    border-radius: 14px;
+    background: rgba(31, 41, 55, 0.04);
+}
+
+/* 标题栏在搜索模式下的强调 */
+.gw-titlebar.is-searching .gw-titlebar__title {
+    background: linear-gradient(120deg, #4338ca 0%, #6366f1 60%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
 /* ---- 标题栏：顶部全宽 ---- */
 .gw-titlebar {
     display: flex;
