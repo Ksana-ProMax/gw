@@ -34,5 +34,11 @@
         "content": "这个阶段，同回合开始阶段，更新卡牌、单位的状态。",
         "image": null,
         "notes": null
+    },
+    {
+        "title": "游戏结束",
+        "content": "当某一方的玩家体力值降到0时，宣告游戏结束",
+        "image": null,
+        "notes": null
     }
 ]
